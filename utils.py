@@ -2,10 +2,10 @@ import sys
 
 def get_in_file():
     if len(sys.argv) <= 1:
-        #print("opening stdin")
+        print("opening stdin")
         inputfile = sys.stdin
     else:
-        #print("opening input file {}".format(sys.argv[1]))
+        print("opening input file {}".format(sys.argv[1]))
         inputfile = open(sys.argv[1], "r")
     return inputfile
 
