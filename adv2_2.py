@@ -10,7 +10,7 @@ class SubmarineDirectionEnum(Enum):
     UNKNOWN = 101
 
 class SubmarineMove():
-    def __init__(self, direction, distance):
+    def __init__(self, direction: SubmarineDirectionEnum, distance: int):
         self.direction = direction
         self.distance = distance
     
@@ -26,15 +26,18 @@ class SubmarineMove():
             return self.distance
         return 0
 
-def create_submarine_direction(line) -> SubmarineDirectionEnum:
+def create_submarine_direction(line: str) -> SubmarineDirectionEnum:
     if(line == "forward"):
         return SubmarineDirectionEnum.FORWARD
-    if(line == "up"):
+    elif(line == "up"):
         return SubmarineDirectionEnum.UP
-    if(line == "down"):
+    elif(line == "down"):
         return SubmarineDirectionEnum.DOWN
+    else:
+        raise Exception("unknown direction")
+        return SubmarineDirectionEnum.UNKNOWN
 
-def create_submarine_move(line) -> SubmarineMove:
+def create_submarine_move(line: str) -> SubmarineMove:
     parts =  line.split(" ")
     direction = create_submarine_direction(parts[0])
     distance = int(parts[1])
@@ -48,11 +51,11 @@ depth = 0
 forward = 0
 aim = 0
 for move in moves:
-    print(move.direction, move.distance)
+    #print(move.direction, move.distance)
     aim += move.get_delta_depth()
     forward += move.get_delta_forward()
     depth += aim * move.get_delta_forward()
 
-print(depth)
-print(forward)
+#print(depth)
+#print(forward)
 print(depth * forward)

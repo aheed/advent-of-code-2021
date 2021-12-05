@@ -9,7 +9,7 @@ def get_in_file():
         inputfile = open(sys.argv[1], "r")
     return inputfile
 
-def get_ints_from_in_file_lines(base = 10):
+def get_ints_from_in_file_lines(base: int = 10) -> list[int]:
     infile = get_in_file()
     ints = [int(line, base) for line in infile]
     infile.close()

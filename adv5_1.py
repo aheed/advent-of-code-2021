@@ -14,7 +14,7 @@ def create_vent_line(text: str) -> list[tuple[int, int]]:
     p1 = get_point(point_texts[0])
     p2 = get_point(point_texts[1])
     
-    res = []
+    res: list[tuple[int, int]] = []
     if (p1[0] == p2[0]):
         if(p1[1] < p2[1]):
             start_point = p1

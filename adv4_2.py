@@ -1,4 +1,3 @@
-from typing import List
 import utils
 
 infile = utils.get_in_file()
@@ -56,7 +55,7 @@ class Board():
 
         return False
 
-    def calc_score(self):
+    def calc_score(self) -> int:
         sum = 0
         for row in range(5):
             for col in range(5):
@@ -72,14 +71,14 @@ def create_rows(text: str) -> list[list[BingoNumber]]:
     return [create_row(five_str) for five_str in text.split('\n')]
 
 
-def create_board(text: str):
+def create_board(text: str) -> Board:
     rows = create_rows(text)
     #cols = create_cols(text)
     return Board(rows)
 
 boards = [create_board(board_text) for board_text in all_boards_texts]
 
-def get_first_bingo_board():
+def get_first_bingo_board_index() -> int:
     for drawn_num in drawn_numbers:
         board_index = 0
         for board in boards:
@@ -87,6 +86,7 @@ def get_first_bingo_board():
             if (board.got_bingo()):
                 return board_index
             board_index += 1
+    raise Exception("should not get here")
 
 def get_last_bingo_board() -> Board:
     boards_with_bingo: list[Board] = []
