@@ -14,7 +14,6 @@ def get_empty_population() -> list[int]:
 start_population = get_empty_population()
 for fish in input:
     start_population[fish] += 1
-
 #print(start_population)
 
 def new_fish_timer(fish_timer: int) -> int:
@@ -49,14 +48,7 @@ def population_from_fish(fish_timer: int, days: int) -> list[int]:
     if (days == 0):
         one_day_population[fish_timer] = 1
         return one_day_population
-    # if (days == 0):
-    #     raise Exception("Should not happen")
-    # if (days == 0):
-    #     return one_day_population
-    
-    # one_day_population[new_fish_timer(fish_timer)] = 1
-    # if (not spawn(fish_timer)):
-    #     return population_from_population(one_day_population, days - 1)
+
     original_fish_population = population_from_fish(new_fish_timer(fish_timer), days - 1)
     if (not spawn(fish_timer)):
         return original_fish_population
@@ -65,17 +57,12 @@ def population_from_fish(fish_timer: int, days: int) -> list[int]:
     res = merge_two_populations(original_fish_population, spawned_population)
     return res
 
-#result = population_from_fish(5, 15)
-#print(result)
-
-#start_population = [0,0,0,0,0,1,0,0,0] #TEMP!!!
-#days_left = 15 #TEMP!!!
 #start_population = [0,1,1,2,1,0,0,0,0] #TEMP!!!
 #days_left = 18 #TEMP!!!
 
 days_left = 256
 result = population_from_population(start_population, days_left)
-print(result)
+#print(result)
 print(sum(result))
 
     
