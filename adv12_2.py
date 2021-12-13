@@ -21,15 +21,19 @@ for line in lines:
 #print(tunnels)
 
 
-def calc_routes(src_cave: str, visited_caves: set[str]) -> int:
+def calc_routes(src_cave: str, visited_caves: set[str], double_small_visit: bool) -> int:
     if src_cave == "end":
         return 1
     
     newly_visited_caves = set([])
+    new_double_small_visit = double_small_visit
 
     if src_cave.islower():
         if src_cave in visited_caves:
-            return 0
+            if not double_small_visit and src_cave != "start":
+                new_double_small_visit = True
+            else:
+                return 0
         newly_visited_caves.add(src_cave)
 
     visited = visited_caves.union(newly_visited_caves)
@@ -37,9 +41,9 @@ def calc_routes(src_cave: str, visited_caves: set[str]) -> int:
     res = int(0)
     if src_cave in tunnels:
         for destination in tunnels[src_cave]:
-            res += calc_routes(destination, visited)
+            res += calc_routes(destination, visited, new_double_small_visit)
     
     return res
 
-result =  calc_routes("start", set([]))
+result =  calc_routes("start", set([]), False)
 print(result)
