@@ -1,78 +1,76 @@
-from functools import cache
+from dataclasses import dataclass
 import utils
 
+@dataclass(frozen=True)
+class Cell:
+    row: int
+    col: int
 
 with utils.get_in_file() as infile:
     lines = [line for line in infile]
 
-grid: list[list[int]] = [[int(depth) for depth in list(line.strip())] for line in lines]
-size = len(grid[0])
+initial_grid = [[int(depth) for depth in list(line.strip())] for line in lines]
+initial_size = len(initial_grid[0])
+#print(initial_size)
 
+size = initial_size
+#print(size)
+
+grid = initial_grid
+#print(grid)
 
 def is_in_bounds(row: int, col: int) -> bool:
     return row >= 0 and row < size and col >= 0 and col < size
 
-def get_neighbors(row: int, col: int) -> list[list[int]]:
-    neigh: list[list[int]] = []
+def get_neighbors(cell: Cell) -> list[Cell]:
+    neigh: list[Cell] = []
 
     def add_if_in_bounds(row: int, col: int):
         if is_in_bounds(row, col):
-            neigh.append([row, col])
+            neigh.append(Cell(row, col))
     
-    add_if_in_bounds(row - 1, col)
-    add_if_in_bounds(row + 1, col)
-    add_if_in_bounds(row, col - 1)
-    add_if_in_bounds(row, col + 1)    
+    add_if_in_bounds(cell.row - 1, cell.col)
+    add_if_in_bounds(cell.row + 1, cell.col)
+    add_if_in_bounds(cell.row, cell.col - 1)
+    add_if_in_bounds(cell.row, cell.col + 1)
     return neigh
 
-res_cached: list[list[int]] = [[False] * size for _ in range(size)]
-res_cache: list[list[int]] = [[1000000] * size for _ in range(size)]
-res_cached_values = int(0)
+infinity = int(1000000)
+prel_res = [[infinity] * size for _ in range(size)]
+unvisited_cells: set[Cell] = set([])
 
-@cache
-def calc_min_risk(start_row: int, start_col: int, start_risk: int, start_max_risk: int) -> int:
-
-    global res_cache
-    global res_cached
-    global res_cached_values
-
-    if res_cached[start_row][start_col]:
-        return start_risk + res_cache[start_row][start_col]
-
-    node_risk = grid[start_row][start_col]
-    min_risk = start_risk + node_risk
-
-    if min_risk > start_max_risk:
-        return min_risk
+def update_prel_res(cell: Cell, res: int) -> None:
+    global prel_res
+    global unvisited_cells
     
-    if start_row == 0 and start_col == 0:
-        return start_risk
+    if res < prel_res[cell.row][cell.col]:
+        prel_res[cell.row][cell.col] = res
+        unvisited_cells.add(cell)
 
-    neighbors = get_neighbors(start_row, start_col)
-    best_candidate = start_max_risk
-    for neigbor in neighbors:
-        candidate = calc_min_risk(neigbor[0], neigbor[1], min_risk, best_candidate)
-        if candidate < best_candidate:
-            best_candidate = candidate
+def calc_risks() -> None:
+    global prel_res
+    global unvisited_cells
 
-    #if best_candidate >= start_max_risk:
-    #    raise Exception(f"should not happen {start_row} {start_col} {best_candidate}")
+    start_cell = Cell(0, 0)
+    update_prel_res(start_cell, 0)
 
-    if best_candidate < start_max_risk:
-        
-        res_cache[start_row][start_col] = best_candidate - start_risk
-        res_cached[start_row][start_col] = True
-        res_cached_values += 1
-        print(f"got a result {res_cached_values}")
-    return best_candidate
-    
+    def visit_cell(cell: Cell) -> None:
+        current_risk = prel_res[cell.row][cell.col]
+        neighbors = get_neighbors(cell)
+        for neighbor in neighbors:
+            update_prel_res(neighbor, current_risk + grid[neighbor.row][neighbor.col])
+        unvisited_cells.remove(cell)
 
-#res = calc_total_risk_on_entry(0, 0) - grid[0][0]
-#max_result = int(size * 2 * 9)
-max_result = int(400)
-#res = calc_min_risk(9, 9, 0, max_result)
-res = calc_min_risk(size - 1, size - 1, 0, max_result)
-print(res)
+    while True:
+        if unvisited_cells == set():
+            break
+
+        next_cell = sorted(unvisited_cells, key = lambda cell: prel_res[cell.row][cell.col])[0]
+        visit_cell(next_cell)
+
+calc_risks()
+#print(prel_res)
+print(prel_res[size-1][size-1])
 
 
     
