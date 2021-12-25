@@ -1,3 +1,6 @@
+#to run:
+#python adv15_2.py in15.txt
+
 from dataclasses import dataclass
 import utils
 
