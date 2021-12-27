@@ -12,6 +12,31 @@ class SnailLiteral:
 class SnailNumber:
     seq: list[SnailLiteral]
 
+    def __str__(self) -> str:
+        depth = int(0)
+        res = ""
+        cnt = int(0)
+        for lit in self.seq:
+            while depth < lit.depth:
+                res += "["
+                depth += 1
+                cnt = int(0)
+            while depth > lit.depth:
+                res += "]"
+                depth -= 1
+                cnt = int(0)
+            
+            if cnt == 0:
+                res += f"[{lit.value},"
+                cnt = 1
+            elif cnt == 1:
+                res += f"{lit.value}]"
+                cnt = 0
+        while depth > 0:
+                res += "]"
+                depth -= 1
+        return res
+
 def read(line: str) -> SnailNumber:
     seq: list[SnailLiteral] = []
     depth = int(0)
@@ -50,7 +75,7 @@ def reduce(n: SnailNumber) -> SnailNumber:
     #return n #TEMP!!!
     res = n
     while True:
-        explode_index = next((index for index, lit in enumerate(res.seq) if lit.depth == 4), None)
+        explode_index = next((index for index, lit in enumerate(res.seq) if lit.depth > 4), None)
         if not explode_index is None:
             res = explode(res, explode_index)
         else:
@@ -84,12 +109,26 @@ with utils.get_in_file() as infile:
     lines = [line.strip() for line in infile]
 
 #print(read(lines[0]))
-r = add(read(lines[0]), read(lines[1]))
-print(r)
+#r = add(read(lines[0]), read(lines[1]))
+#print(r)
 #print(magnitude(r))
 
-#n = read("[9,1]")
-n = read("[[9,1],[1,9]]")
-print("\n")
-print(n)
-print(magnitude(n))
+# #n = read("[9,1]")
+# #n = read("[[9,1],[1,9]]")
+# #n = read("[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]")
+# n = read("[[[[4,3],4],4],[7,[[8,4],9]]]")
+# n2 = read("[1,1]")
+# print("\n")
+# print(n)
+# print(n2)
+# r = add(n, n2)
+# print(r)
+# print(magnitude(r))
+
+in_numbers = [read(line) for line in lines]
+res = in_numbers[0]
+
+for num in in_numbers[1:]:
+    res = add(res, num)
+
+print(magnitude(res))
