@@ -24,6 +24,7 @@ for line in lines:
 
 print(len(l1))
 print(l1[0])
+print(l1[-1])
 
 @dataclass(frozen=True)
 class Point:
@@ -44,15 +45,20 @@ class Scanner:
     #orientation: Orientation | None #scanner0 coordinate system
     #position: Point | None #scanner0 coordinate system
     beacons: list[Point] #local coordinate system
+    name: str
 
 def read_point(line: str) -> Point:
     composants_str = line.split(",")
     composants_int = [int(c) for c in composants_str]
     return Point(composants_int)
 
+nof_read_scanners = int(0)
 def read_scanner(lines: list[str]) -> Scanner:
+    global nof_read_scanners
     beacs = [read_point(p) for p in lines]
-    return Scanner(beacs)
+    new_scanner= Scanner(beacs, f"scanner{nof_read_scanners}")
+    nof_read_scanners += 1
+    return new_scanner
 
 raw_scanners = [read_scanner(l2) for l2 in l1]
 
@@ -61,7 +67,7 @@ print(raw_scanners[0])
 
  # declare scanner0 as normalized
 normalized_scanners = [raw_scanners.pop(0)]
-#normalized_scanners = [raw_scanners.pop(1)] #TEMP!!!
+#normalized_scanners = [raw_scanners.pop(21)] #TEMP!!!
 
 orientations = [[0,1,2], [0,2,1], [1,0,2], [1,2,0], [2,0,1], [2,1,0]]
 
@@ -71,7 +77,9 @@ def normalize_beacon(raw: Point, orientation: Orientation) -> Point:
 
 def normalize_scanner(raw: Scanner, orientation: Orientation) -> Scanner:
     beacs = [normalize_beacon(b, orientation) for b in raw.beacons]
-    return Scanner(beacs)
+    return Scanner(beacs, raw.name)
+
+scanner_distances: dict[str, Point] = {normalized_scanners[0].name: Point([0,0,0])}
 
 last_nof_matches = 0
 while len(raw_scanners) > 0:
@@ -95,14 +103,20 @@ while len(raw_scanners) > 0:
                                     dist = Point([c_origin - c_dist for c_origin,c_dist in zip(origin_beacon.coords, distant_beacon.coords)])
                                     nof_beacons_at_dist = beacon_distances.get(dist, 0) + 1
                                     beacon_distances[dist] = nof_beacons_at_dist
-                            max_nof_beacons_at_any_dist = sorted(beacon_distances.values())[-1]
+                            #max_nof_beacons_at_any_dist = sorted(beacon_distances.values())[-1]
+                            dist_and_max_nof_beacons_at_any_dist = sorted(beacon_distances.items(), key= lambda item: item[1])[-1]
+                            max_nof_beacons_at_any_dist = dist_and_max_nof_beacons_at_any_dist[1]
+
                             if max_nof_beacons_at_any_dist > 1:
                                 print(f"n_scanner_index: {n_scanner_index} r_scanner_index: {r_scanner_index}  max_nof_beacons_at_any_dist: {max_nof_beacons_at_any_dist}")
                             if max_nof_beacons_at_any_dist >= 12:
+                            #if max_nof_beacons_at_any_dist >= 6:
                                 print("matching scanners!!")
                                 normalized_scanners.append(prel_norm_scanner)
                                 raw_scanners.pop(r_scanner_index)
-                                #todo: store distance and orientation for the normalized scanner
+                                dist_to_n_scanner = scanner_distances[n_scanner.name]
+                                dist_to_prel_norm_scanner = Point([c1 + c2 for c1,c2 in zip(dist_to_n_scanner.coords, dist_and_max_nof_beacons_at_any_dist[0].coords)])
+                                scanner_distances[prel_norm_scanner.name] = dist_to_prel_norm_scanner
                                 scanner_matched = True
                                 break
                         if scanner_matched:
@@ -115,6 +129,26 @@ while len(raw_scanners) > 0:
                 break
         if scanner_matched:
             break
-    
+
+print(raw_scanners)    
 print(len(normalized_scanners))
 print(len(raw_scanners))
+print(len(scanner_distances))
+print(scanner_distances)
+
+norm_beacons: set[Point] = set([])
+
+for sc in normalized_scanners:
+    sc_dist = scanner_distances[sc.name]
+    for beacon in sc.beacons:
+        norm_beacon = Point([c_sc + c_bea for c_sc,c_bea in zip(sc_dist.coords, beacon.coords)])
+        norm_beacons.add(norm_beacon)
+
+print(len(norm_beacons))
+#print(len(raw_scanners[0].beacons))
+
+
+#########
+#655 is too high
+#565 is too high
+
