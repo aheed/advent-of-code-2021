@@ -103,13 +103,15 @@ print(len(in_image))
 print(len(in_image[0]))
 print(sum_pixels(in_image))
 
-g1 = enhance_image(in_image, 0)
+outer_pixels_value = int(0)
+g1 = enhance_image(in_image, outer_pixels_value)
 print_image(g1)
 print(len(g1))
 print(len(g1[0]))
 print(sum_pixels(g1))
 
-g2 = enhance_image(g1, 1)
+outer_pixels_value = g1[0][0]
+g2 = enhance_image(g1, outer_pixels_value)
 print_image(g2)
 print(len(g2))
 print(len(g2[0]))
