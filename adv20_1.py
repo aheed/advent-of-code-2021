@@ -23,7 +23,7 @@ in_image = [read_row(line) for line in lines[2:]]
 #size = len(in_image[0])
 
 
-def get_code(img: list[list[int]], row: int, col: int) -> int:
+def get_code(img: list[list[int]], row: int, col: int, outside_value: int) -> int:
 
     def is_in_bounds(img: list[list[int]], row: int, col: int) -> bool:
         size = len(img[0])
@@ -32,7 +32,7 @@ def get_code(img: list[list[int]], row: int, col: int) -> int:
     def get_bit_int(img: list[list[int]], row: int, col: int) -> int:
         if is_in_bounds(img, row, col):
             return img[row][col]
-        return 0
+        return outside_value
     
     #def get_bit_str(row: int, col: int) -> str:
     #    return str(get_bit_int(row, col))
@@ -52,8 +52,8 @@ def get_code(img: list[list[int]], row: int, col: int) -> int:
     code = int("".join([str(bit) for bit in bits]), 2)
     return code
 
-def get_pixel(img: list[list[int]], row: int, col: int) -> int:
-    pix = algo[get_code(img, row, col)]
+def get_pixel(img: list[list[int]], row: int, col: int, outside_value: int) -> int:
+    pix = algo[get_code(img, row, col, outside_value)]
     return pix
 
 
@@ -87,7 +87,7 @@ def enhance_image(img: list[list[int]], outside_value: int) -> list[list[int]]:
     out_size = len(out_image)
     for row in range(out_size):
         for col in range(out_size):
-            out_image[row][col] = get_pixel(expanded_image, row, col)
+            out_image[row][col] = get_pixel(expanded_image, row, col, outside_value)
     
     return out_image
 
