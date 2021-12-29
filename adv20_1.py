@@ -69,15 +69,15 @@ def sum_pixels(img: list[list[int]]) -> int:
 
 #print(sum_pixels(in_image))
 
-def expand_image(img: list[list[int]]) -> list[list[int]]:
+def expand_image(img: list[list[int]], outside_value: int) -> list[list[int]]:
     new_size = len(img) + 6
     #pad_line = [0] * new_size
-    mid_rows = [[0,0,0,*row,0,0,0] for row in img]
-    return [[0] * new_size, [0] * new_size, [0] * new_size, *mid_rows, [0] * new_size, [0] * new_size, [0] * new_size]
+    mid_rows = [[outside_value,outside_value,outside_value,*row,outside_value,outside_value,outside_value] for row in img]
+    return [[outside_value] * new_size, [outside_value] * new_size, [outside_value] * new_size, *mid_rows, [outside_value] * new_size, [outside_value] * new_size, [outside_value] * new_size]
 
-def enhance_image(img: list[list[int]]) -> list[list[int]]:
-    expanded_image = expand_image(img)
-    out_image = expand_image(img)
+def enhance_image(img: list[list[int]], outside_value: int) -> list[list[int]]:
+    expanded_image = expand_image(img, outside_value)
+    out_image = expand_image(img, outside_value)
 
     # def enhance_row(row_index: int row: list[int]) -> list[int]:
     #     return [get_pixel(new_image, )]
@@ -103,15 +103,17 @@ print(len(in_image))
 print(len(in_image[0]))
 print(sum_pixels(in_image))
 
-g1 = enhance_image(in_image)
+g1 = enhance_image(in_image, 0)
 print_image(g1)
 print(len(g1))
 print(len(g1[0]))
 print(sum_pixels(g1))
 
-g2 = enhance_image(g1)
+g2 = enhance_image(g1, 1)
 print_image(g2)
 print(len(g2))
 print(len(g2[0]))
 print(sum_pixels(g2))
 # print(g2)
+
+#5225 is correct
