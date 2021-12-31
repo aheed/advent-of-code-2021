@@ -14,14 +14,14 @@ spots = ["."] * nof_spots
 ###D#B#D#A###
   #C#C#A#B#
   #########
-# spots[7] = "D"
-# spots[8] = "B"
-# spots[9] = "D"
-# spots[10] = "A"
-# spots[11] = "C"
-# spots[12] = "C"
-# spots[13] = "A"
-# spots[14] = "B"
+spots[7] = "D"
+spots[8] = "B"
+spots[9] = "D"
+spots[10] = "A"
+spots[11] = "C"
+spots[12] = "C"
+spots[13] = "A"
+spots[14] = "B"
 
 # example (answer is 12521):
 #############
@@ -29,14 +29,25 @@ spots = ["."] * nof_spots
 ###B#C#B#D###
   #A#D#C#A#
   #########
-spots[7] = "B"
-spots[8] = "C"
-spots[9] = "B"
-spots[10] = "D"
-spots[11] = "A"
-spots[12] = "D"
-spots[13] = "C"
-spots[14] = "A"
+# spots[7] = "B"
+# spots[8] = "C"
+# spots[9] = "B"
+# spots[10] = "D"
+# spots[11] = "A"
+# spots[12] = "D"
+# spots[13] = "C"
+# spots[14] = "A"
+
+### TEMP!!!
+# spots[11] = "A"
+# spots[8] = "B"
+# spots[9] = "C"
+# spots[4] = "D"
+# spots[14] = "A"
+# spots[12] = "B"
+# spots[13] = "C"
+# spots[10] = "D"
+###
 
 target_spots = ["."] * nof_spots
 
@@ -114,7 +125,7 @@ def get_coords(index: int) -> tuple[int, int]:
 def is_target_position(spots: list[str]) -> bool:
   return next((False for index in range(7,15) if spots[index] != target_spots[index]), True)
 
-infinity = int(1000000)
+infinity = int(100000)
 
 def min_energy_to_reach_target(spots: list[str]) -> int:
   if is_target_position(spots):
@@ -126,9 +137,9 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
   for index in room_spots:
     amphi_type = spots[index]
     cost = int(0)
-    if amphi_type != "." and amphi_type != target_spots[index]:
-      x,y = spot_coords[index]
-      
+    x,y = spot_coords[index]
+    
+    if amphi_type != "." and (amphi_type != target_spots[index] or (y == 1 and target_spots[get_spot_index(x, 2)] != spots[get_spot_index(x, 2)])):
       # move up
       ok = True
       while y > 0:
@@ -202,7 +213,7 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
         continue
 
       # move down
-      if spots[get_spot_index(target_x, 1)] == ".":
+      if spots[get_spot_index(target_x, 1)] == "." and (spots[get_spot_index(target_x, 2)] == "." or spots[get_spot_index(target_x, 2)] == amphi_type):
         if spots[get_spot_index(target_x, 2)] == ".":
           target_y = 2
         else:
@@ -211,7 +222,9 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
         cost = (maxx - minx + target_y) * step_costs[amphi_type]
         new_position = spots[:]
         new_spot_index = get_spot_index(target_x, target_y)
+        assert(new_position[new_spot_index] == ".")
         new_position[new_spot_index] = amphi_type
+        assert(new_position[index] == amphi_type)
         new_position[index] = "."
         best_so_far = min(best_so_far, cost + min_energy_to_reach_target(new_position))
 
