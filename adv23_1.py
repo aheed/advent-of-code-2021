@@ -125,13 +125,24 @@ def get_coords(index: int) -> tuple[int, int]:
 def is_target_position(spots: list[str]) -> bool:
   return next((False for index in range(7,15) if spots[index] != target_spots[index]), True)
 
-infinity = int(100000)
+infinity = int(1000000)
+best_so_far = infinity
+prunes = int(0)
 
-def min_energy_to_reach_target(spots: list[str]) -> int:
+def min_energy_to_reach_target(energy_spent: int, spots: list[str]) -> int:
+  global best_so_far
+  global prunes
+
+  if energy_spent >= best_so_far:
+    #print("pruned!")
+    prunes += 1
+    return energy_spent
+
   if is_target_position(spots):
-    return 0
-
-  best_so_far = infinity
+    if energy_spent < best_so_far:
+      best_so_far = energy_spent
+      print(f"new best: {best_so_far} p:{prunes}")
+    return energy_spent
 
   #move out
   for index in room_spots:
@@ -166,7 +177,7 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
           new_position = spots[:]
           new_position[new_spot] = amphi_type
           new_position[index] = "."
-          best_so_far = min(best_so_far, cost + min_energy_to_reach_target(new_position))
+          best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
       
       
       # move right from room exit
@@ -186,7 +197,7 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
           new_position = spots[:]
           new_position[new_spot] = amphi_type
           new_position[index] = "."
-          best_so_far = min(best_so_far, cost + min_energy_to_reach_target(new_position))
+          best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
 
   #move in
   for index in corridor_spots:
@@ -226,9 +237,10 @@ def min_energy_to_reach_target(spots: list[str]) -> int:
         new_position[new_spot_index] = amphi_type
         assert(new_position[index] == amphi_type)
         new_position[index] = "."
-        best_so_far = min(best_so_far, cost + min_energy_to_reach_target(new_position))
+        best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
 
   return best_so_far
 
-res = min_energy_to_reach_target(spots)
+res = min_energy_to_reach_target(0, spots)
+print(f"p: {prunes}")
 print(res)
