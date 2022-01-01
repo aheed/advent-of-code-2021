@@ -199,6 +199,57 @@ def min_energy_to_reach_target(energy_spent: int, spots: list[str]) -> int:
                 return True
         return False
 
+  
+  #move in
+  for index in corridor_spots:
+    amphi_type = spots[index]
+    #cost = int(0)
+    ok = True
+    if amphi_type != ".":
+      start_x,_ = spot_coords[index]
+      target_x = room_x[amphi_type]
+      #minx = min(start_x, target_x)
+      #maxx = max(start_x, target_x)
+      if start_x < target_x:
+        minx = start_x + 1
+        maxx = target_x + 1
+      else:
+        minx = target_x
+        maxx = start_x
+      for x in range(minx, maxx):
+        new_spot = get_spot_index(x, 0)
+        ok = new_spot == -1 or spots[new_spot] == "."
+        if not ok:
+          break
+      if not ok:
+        continue
+
+######################################
+      # move down
+    #   if spots[get_spot_index(target_x, 1)] == "." and (spots[get_spot_index(target_x, 2)] == "." or spots[get_spot_index(target_x, 2)] == amphi_type):
+    #     if spots[get_spot_index(target_x, 2)] == ".":
+    #       target_y = 2
+    #     else:
+    #       target_y = 1
+        
+      if not is_wrong_amphi_type_in_room(target_x):
+
+        target_y = 4
+        while target_y > 1 and spots[get_spot_index(target_x, target_y)] != ".":
+            target_y -= 1
+            
+        cost = (maxx - minx + target_y) * step_costs[amphi_type]
+        new_position = spots[:]
+        new_spot_index = get_spot_index(target_x, target_y)
+        if new_position[new_spot_index] != ".":
+            print(target_x, target_y, new_spot_index, new_position[new_spot_index])
+        assert(new_position[new_spot_index] == ".")
+        new_position[new_spot_index] = amphi_type
+        assert(new_position[index] == amphi_type)
+        new_position[index] = "."
+        #best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
+        return min_energy_to_reach_target(energy_spent + cost, new_position)
+
   #move out
   for index in room_spots:
     amphi_type = spots[index]
@@ -254,54 +305,6 @@ def min_energy_to_reach_target(energy_spent: int, spots: list[str]) -> int:
           new_position[index] = "."
           best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
 
-  #move in
-  for index in corridor_spots:
-    amphi_type = spots[index]
-    #cost = int(0)
-    ok = True
-    if amphi_type != ".":
-      start_x,_ = spot_coords[index]
-      target_x = room_x[amphi_type]
-      #minx = min(start_x, target_x)
-      #maxx = max(start_x, target_x)
-      if start_x < target_x:
-        minx = start_x + 1
-        maxx = target_x + 1
-      else:
-        minx = target_x
-        maxx = start_x
-      for x in range(minx, maxx):
-        new_spot = get_spot_index(x, 0)
-        ok = new_spot == -1 or spots[new_spot] == "."
-        if not ok:
-          break
-      if not ok:
-        continue
-
-######################################
-      # move down
-    #   if spots[get_spot_index(target_x, 1)] == "." and (spots[get_spot_index(target_x, 2)] == "." or spots[get_spot_index(target_x, 2)] == amphi_type):
-    #     if spots[get_spot_index(target_x, 2)] == ".":
-    #       target_y = 2
-    #     else:
-    #       target_y = 1
-        
-      if not is_wrong_amphi_type_in_room(target_x):
-
-        target_y = 4
-        while target_y > 1 and spots[get_spot_index(target_x, target_y)] != ".":
-            target_y -= 1
-            
-        cost = (maxx - minx + target_y) * step_costs[amphi_type]
-        new_position = spots[:]
-        new_spot_index = get_spot_index(target_x, target_y)
-        if new_position[new_spot_index] != ".":
-            print(target_x, target_y, new_spot_index, new_position[new_spot_index])
-        assert(new_position[new_spot_index] == ".")
-        new_position[new_spot_index] = amphi_type
-        assert(new_position[index] == amphi_type)
-        new_position[index] = "."
-        best_so_far = min(best_so_far, min_energy_to_reach_target(energy_spent + cost, new_position))
 
   return best_so_far
 
